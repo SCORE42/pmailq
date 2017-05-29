@@ -26,8 +26,8 @@ _VERSION = '0.6'
 _ORIGINAL_AUTHOR = 'Emmanuel Bouthenot <kolter@debian.org>'
 _AUTHOR = 'Renaud Rakotomalala <renaudmanda@score42.org>'
 
-MAILQ = "postqueue -p"
-DELQ = "postsuper -d"
+MAILQ = "postqueue"
+DELQ = "postsuper"
 
 
 class Proc:
@@ -98,7 +98,7 @@ class Mailqueue:
         self.filters[key] = value
 
     def parse(self):
-        self.mailq = MAILQ + " -c " + self.filters['config_dir']
+        self.mailq = MAILQ + " -p -c " + self.filters['config_dir']
         p_ret, p_stdout, p_stderr = Proc().run(self.mailq)
 
         # mail system down ?
@@ -224,7 +224,7 @@ class Mailqueue:
                 for o in n['dest']:
                     e.append(o)
                 if self.check(m['size'], m['active'], m['hold'], m['source'], e, i):
-                    p_ret, _, p_stderr = Proc().run('%s %s' % (self.delq, m['id']))
+                    p_ret, _, p_stderr = Proc().run('%s -d %s' % (self.delq, m['id']))
                     if p_ret != 0:
                         print "deleting %s [FAILED] (%s)" % (m['id'], re.sub('\s+', ' ', p_stderr).strip())
                     else:
