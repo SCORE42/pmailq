@@ -7,6 +7,9 @@
 # To Public License, Version 2, as published by Sam Hocevar. See
 # http://sam.zoy.org/wtfpl/COPYING for more details.
 
+# Copyright for portions of project Foo are held by [original author, year] as part of project Bar. All other
+# copyright for project Foo are held by [your name, year].
+
 import fcntl
 import fnmatch
 import os
@@ -20,8 +23,8 @@ _NAME = 'pmailq'
 _HELP = "[OPTIONS] [ list | parse | del ]"
 _DESC = "%s postfix mail queue manager" % _NAME
 _VERSION = '0.4'
-_ORIGINAL_AUTHOR = 'Emmanuel Bouthenot <kolter@openics.org>'
-_AUTHOR = 'Renaud Rakotomalala <renaud@score42.org>'
+_ORIGINAL_AUTHOR = 'Emmanuel Bouthenot <kolter@debian.org>'
+_AUTHOR = 'Renaud Rakotomalala <renaudmanda@score42.org>'
 
 MAILQ = "postqueue -p"
 DELQ = "postsuper -d "
