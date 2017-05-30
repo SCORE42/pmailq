@@ -20,14 +20,14 @@ import sys
 from optparse import OptionParser, OptionGroup  # needs python >= 2.3
 
 _NAME = 'pmailq'
-_HELP = "[OPTIONS] [ list | parse | del ]"
+_HELP = "[OPTIONS] [ list | parse | del | hold ]"
 _DESC = "%s postfix mail queue manager" % _NAME
 _VERSION = '0.6'
 _ORIGINAL_AUTHOR = 'Emmanuel Bouthenot <kolter@debian.org>'
 _AUTHOR = 'Renaud Rakotomalala <renaudmanda@score42.org>'
 
 MAILQ = "postqueue"
-DELQ = "postsuper"
+POSTSUPER = "postsuper"
 
 
 class Proc:
@@ -215,7 +215,7 @@ class Mailqueue:
                         m['id'], m['date'], m['size'], int(m['active']), int(m['hold']), m['source'], ",".join(n['dest']))
 
     def cmd_del(self):
-        self.delq = DELQ + " -c " + self.filters['config_dir']
+        self.delq = POSTSUPER + " -c " + self.filters['config_dir']
         for m in self.mailqueue:
             e = []
             i = []
@@ -229,6 +229,24 @@ class Mailqueue:
                         print "deleting %s [FAILED] (%s)" % (m['id'], re.sub('\s+', ' ', p_stderr).strip())
                     else:
                         print "deleting %s [OK]" % m['id']
+
+    def cmd_hold(self):
+        self.holdq = POSTSUPER + " -c " + self.filters['config_dir']
+        self.filters['hold'] = False
+
+        for m in self.mailqueue:
+            e = []
+            i = []
+            for n in m['queue']:
+                i.append(n['info'])
+                for o in n['dest']:
+                    e.append(o)
+                if self.check(m['size'], m['active'], m['hold'], m['source'], e, i):
+                    p_ret, _, p_stderr = Proc().run('%s -h %s' % (self.holdq, m['id']))
+                    if p_ret != 0:
+                        print "holding %s [FAILED] (%s)" % (m['id'], re.sub('\s+', ' ', p_stderr).strip())
+                    else:
+                        print "holding %s [OK]" % m['id']
 
 
 def main():
@@ -282,6 +300,8 @@ def main():
         m.cmd_parse()
     elif args[0] == "del":
         m.cmd_del()
+    elif args[0] == "hold":
+        m.cmd_hold()
     else:
         print "%s %s" % (_NAME, _HELP)
 
